@@ -8,7 +8,7 @@ from shell import ShellExecutor
 from tools.BashTools import BashTools
 from tools.ToolRgister import ToolRegistry
 BASE_URL = "https://api.deepseek.com/anthropic"
-API_KEY = "sk-a46bd8f03acc4acc824b6b967bb725a9"
+API_KEY = ""
 
 context = [{"role": "system", "content": "请用中文跟我答复"}]
 client = anthropic.Anthropic(api_key=API_KEY, base_url=BASE_URL)
