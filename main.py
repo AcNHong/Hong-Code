@@ -5,37 +5,45 @@ import anthropic
 
 from constant.SystemToolPrompt import get_system_prompt
 from shell import ShellExecutor
-from tools.BashTools import BashTools
-from tools.ToolRgister import ToolRegistry
-BASE_URL = "https://api.deepseek.com/anthropic"
-API_KEY = "sk-a46bd8f03acc4acc824b6b967bb725a9"
+from tools.Tool import get_tools, find_tool_by_name
+from util.api import toolToAPISchema
+from util.envoriment import get_auth
+from util.toolContext import toolContext
 
-context = [{"role": "system", "content": "请用中文跟我答复"}]
+context = []
+
+#api
+auth = get_auth()
+BASE_URL = auth["BASE_URL"]
+API_KEY = auth["API_KEY"]
 client = anthropic.Anthropic(api_key=API_KEY, base_url=BASE_URL)
 
-tool_r = ToolRegistry()
+init_tools:list = []
+
 executor = ShellExecutor()
+tool_ctx = toolContext(executor=executor)
 # 系统提示词
 system_prompt = get_system_prompt()
 
 async def main():
 
     # 注册工具
-    bash_tool = BashTools()
-    tool_r.register(bash_tool)
-    # toApi
-    tools = tool_r.to_api_schemas()
+    global init_tools
+    init_tools = get_tools()
+    api_tools = list(map(toolToAPISchema,init_tools))
+
     while True:
         code = input("请输入指令:")
-        await queryModel(tools,code)
+        await queryModel(api_tools,code)
 
-async def exec_tool(name,args):
-    if name == "Bash":
-        tool = tool_r.get_by_name(name)
-        result = await tool.execute(args["command"],executor)
-        return result
-    else:
-        return "Unknown tool"
+async def exec_tool(block,ctx:toolContext):
+
+    tool = find_tool_by_name(block.name,init_tools)
+    if not tool:
+        return "Unknown tool name"
+    result = await tool.get("call")(block.input,ctx)
+    return result
+
 
 async def queryModel(tools,code):
     # queryModel
@@ -85,8 +93,8 @@ async def queryModel(tools,code):
         for text in text_responses:
             print(f"AI: {text}")
 
-        for thinking in thinking_responses:
-            print(f"思考: {thinking}")
+        # for thinking in thinking_responses:
+        #     print(f"思考: {thinking}")
 
         if not has_use_tool:
             print("当前任务执行完成，请输入指令:")
@@ -98,7 +106,7 @@ async def queryModel(tools,code):
         for block in tool_use_blocks:
             # 执行工具
             try:
-                result = await exec_tool(block.name,block.input)
+                result = await exec_tool(block,tool_ctx)
                 # 添加工具结果
                 tool_results.append({
                     "type": "tool_result",
@@ -120,7 +128,7 @@ async def queryModel(tools,code):
                 "role": "user",
                 "content": tool_results
             })
-            # ✅ 继续对话，让AI处理工具结果
+            # 继续对话，让AI处理工具结果
             print("等待AI处理工具结果...")
             continue  # 回到循环开始，让AI处理工具结果
 
