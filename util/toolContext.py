@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from shell import ShellExecutor
+from tools.shell import ShellExecutor
 
 
 @dataclass
