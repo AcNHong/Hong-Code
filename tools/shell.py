@@ -382,7 +382,7 @@ async def example_usage():
     print(f"使用 shell: {shell}")
     try:
         result = await executor.exec(
-            "echo 'hello world'",
+            "",
             shell_type=shell,
             timeout=5,
             should_use_sandbox=True,

@@ -32,5 +32,22 @@ def find_tool_by_name(name:str,tools:list[toolDef]) -> Optional[toolDef]:
             return tool
     return None
 
+# 检查工具参数
+def check_tool_input(tool_input:dict) -> dict:
+    if not tool_input:
+        return {
+            "result": False,
+            "error_message":"tool use error:Cannot pass in (null or empty string value or other unmeaning null) values "
+        }
+    if not isinstance(tool_input,dict):
+        return {
+            "result": False,
+            "error_message": "tool use error:input type not is a map -> {}."
+        }
+
+    return  {
+        "result": True,
+        "error_message": ""
+    }
 
 
