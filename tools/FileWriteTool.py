@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from tools.Tool import toolDef, register_tools
-
+from util.files import get_file_modification_time
 
 
 async def file_write(input_dict:dict, *args) -> str:
@@ -20,16 +20,28 @@ async def file_write(input_dict:dict, *args) -> str:
     structured_patch = input_dict.get("structured_patch")
     original_file = input_dict.get("original_file")
     # 确保目录存在
-    if not Path(os.path.dirname(file_path)).exists():
-        os.mkdir(os.path.dirname(file_path))
-        Path(os.path.dirname(file_path)).chmod(0o700)
+    os.makedirs(os.path.dirname(file_path),exist_ok=True)
 
-    if write_type == "create":
-        with open(file_path,"w+",encoding="utf-8") as f:
-            f.write(content)
+    # 比对文件内容
+    meta_content = ""
+    try:
+        with open(file_path, "r+", encoding="utf-8") as f:
+            meta_content = f.read(file_path)
+    except FileNotFoundError as e:
+        # 忽略
+        pass
+    except Exception as e:
+        # 不明IO异常抛出
+        raise e
+    # 如果有数据，则进一步判断
+    if not meta_content:
+        file_st_mtime = get_file_modification_time(file_path) #最后一次修改时间
+        # todo 继续完成其它部分
 
-    elif write_type == "update":
-        return "写入不支持update"
+
+
+    with open(file_path,"w+",encoding="utf-8") as f:
+        f.write(content)
 
     return ""
 
@@ -38,6 +50,7 @@ def is_readonly(*arg,**kwargs):
 
 def prompt(**kwargs) -> str:
     return f"""write file with file_path and content and type("create","update")
+-must read whole file content before write file,set param original_file
 -must need params 'file_path'、"content"、"update"
 -Try to write the entire document in one go.
 -If you need to update the file，use other tool
