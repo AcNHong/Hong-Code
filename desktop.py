@@ -11,6 +11,7 @@ from api.api import QueryModel
 from constant.SystemToolPrompt import get_system_prompt
 from tools.Tool import get_tools
 from tools.shell import ShellExecutor
+from util.fileCacheUtil import CacheUtils
 from util.toolContext import toolContext
 
 
@@ -31,7 +32,10 @@ class DesktopApp(ctk.CTk):
         self.context = []
         self.tools = get_tools()
         self.query_model = None
-        self.tool_ctx = toolContext(executor=ShellExecutor())
+        self.tool_ctx = toolContext(
+            executor=ShellExecutor(),
+            file_cache_util=CacheUtils(100)
+        )
         self.is_waiting = False
 
         self._build_ui()

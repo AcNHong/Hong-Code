@@ -23,7 +23,8 @@ async def exec_tool(block, ctx: toolContext, tools):
     if not valid_result.get("result",False):
         return valid_result.get("error_message","")
 
-    result = await tool.call(block.input, ctx)
+    result = await tool.call(block.input, tool_context=ctx)
+    print(f"执行结果：\n{result}")
     return result
 
 

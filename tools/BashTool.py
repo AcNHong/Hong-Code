@@ -36,14 +36,14 @@ def inputSchema():
         "required": ["command"]               # 必填参数列表
     })()
 
-async def runshell(input, ctx:toolContext) -> str:
+async def runshell(model_input,tool_context:toolContext, **kwargs) -> str:
     """
 
-    :param input: input
-    :param ctx: 工具上下文
+    :param tool_context:
+    :param model_input: input
     :return:
     """
-    shell_result = await ctx.executor.exec(input["command"])
+    shell_result = await tool_context.executor.exec(model_input["command"])
     return shell_result.stdout
 
 def is_readonly(*arg,**kwargs):

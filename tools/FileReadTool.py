@@ -1,21 +1,24 @@
 from pathlib import Path
 
 from tools.Tool import toolDef, register_tools
+from util.fileCacheUtil import FileState
+from util.files import get_file_modification_time
+from util.toolContext import toolContext
 
 MAXLINE = 2000
 
-async def fileRead(input_dict:dict, *args) -> str:
+async def fileRead(input_dict:dict, tool_context:toolContext,**kwargs) -> str:
     """
 
+    :param tool_context:
     :param input_dict:
     :param input_dict: input
-    :param ctx: 工具上下文
     :return:
     """
     file_path = input_dict["file_path"]
     offset = input_dict.get("offset")
     limit = input_dict.get("limit")
-
+    read_file_state = tool_context.file_cache_util
     path = Path(file_path).expanduser().resolve()
 
     if not path.exists():
@@ -27,6 +30,11 @@ async def fileRead(input_dict:dict, *args) -> str:
         content = path.read_text(encoding="utf-8")
     except Exception as e:
         return f"Error reading file: {e}"
+    # set cache
+    read_file_state.set_key_value(file_path,FileState(
+        content = content,
+        timestamp = get_file_modification_time(file_path)
+    ))
 
     lines = content.splitlines()
 

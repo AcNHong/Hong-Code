@@ -24,7 +24,9 @@ simple_introduction = "You are Hong Code, AcNHong CLI for other custom model(llm
 
 chat_language = "The interaction language is Chinese, unless the user has custom requirements. Custom field: user_language"
 
-tool = f"You can use the built-in tool Bash, either based on bash or PowerShell, and your current system platform is:\n{get_platform_info()}；If you want to continue using the tool while performing the task, you must call the execution function for each step. Each step must be meaningful. If the task is completed, you can stop the tool call."
+tool = f"""You can use the built-in tool Bash, either based on bash or PowerShell, and your current system platform is:\n{get_platform_info()}；If you want to continue using the tool while performing the task, you must call the execution function for each step. Each step must be meaningful. If the task is completed, you can stop the tool call.
+Apart from the directory specified by the user, the responsible party can only operate within the current directory.
+"""
 
 def get_system_prompt():
     system_prompt = [

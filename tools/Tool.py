@@ -8,7 +8,7 @@ class toolDef:
     description:str # 工具描述字段
     prompt:Callable[..., str]  # 表示接受任意参数，返回 str
     input_schema:dict # api input_schema
-    call:Callable[[dict,Any],Any] # 工具执行回调
+    call:Callable[...,Any] # 工具执行回调
     is_readonly:bool = False # 是否可以并发 （只读工具可以采用并发，其余都不能）
 
 # 注册工具列表

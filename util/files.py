@@ -23,9 +23,9 @@ def get_file_modification_time(file_path:str) -> int:
         mtime_ms = stat_result.st_mtime * 1000
         return math.floor(mtime_ms)
     except FileNotFoundError:
-        return False
+        return 0
     except OSError as e:
         # 处理其他操作系统错误
         print(f"Error accessing file {file_path}: {e}")
-        return False
+        return 0
 
