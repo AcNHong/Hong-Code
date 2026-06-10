@@ -61,7 +61,7 @@ claude_code_for_py/
 
 ### 安装
 
-`ash
+`Bash
 # 1. 克隆项目
 git clone <your-repo-url>
 cd claude_code_for_py
@@ -83,10 +83,10 @@ pip install anthropic customtkinter
 
 在运行前需要设置以下环境变量：
 
-`ash
+`Bash
 # Windows (PowerShell)
-https://api.deepseek.com/anthropic = "https://api.anthropic.com"
-sk-a46bd8f03acc4acc824b6b967bb725a9  = "your-api-key-here"
+$env:BASE_URL = "https://api.anthropic.com" (示例)
+$env:API_KEY = "your-api-key-here" 
 
 # Linux/macOS (Bash/Zsh)
 export BASE_URL="https://api.anthropic.com"
@@ -102,7 +102,7 @@ export API_KEY="your-api-key-here"
 
 ### 运行
 
-`ash
+`Bash
 # CLI 模式
 python main.py
 
