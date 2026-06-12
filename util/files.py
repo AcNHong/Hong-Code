@@ -29,3 +29,60 @@ def get_file_modification_time(file_path:str) -> int:
         print(f"Error accessing file {file_path}: {e}")
         return 0
 
+# 编码检测
+def detect_file_encoding(resolved_path:str) -> str:
+    with open(resolved_path, 'rb') as f:
+        head = f.read(4096)
+
+    if len(head) == 0:
+        return 'utf-8'
+
+    if head[:2] == b'\xff\xfe':
+        return 'utf-16-le'
+    if head[:3] == b'\xef\xbb\xbf':
+        return 'utf-8'
+
+    return 'utf-8'
+
+def detect_line_endings_for_string(content:str) -> str:
+    crlf_count = 0
+    lf = 0
+    for i,c in enumerate(content):
+        if c == "\n":
+            if i > 0 and content[i-1] == "\r":
+                crlf_count+=1
+            else:
+                lf+=1
+    # 默认LF
+    line_encoding = "CRLF" if crlf_count > lf else "LF"
+
+    return line_encoding
+
+# 写入文件
+def write_text_content(file_path:str,content:str,encoding:str,ending:str):
+    if ending == "CRLF":
+        # 为了防止大模型给的文本包含\r\n的文本
+        "\r\n".join(content.replace("\r\n","\n").split("\n"))
+
+    with open(file_path,mode="w+",encoding=encoding) as f:
+        f.write(content)
+
+# 读取文件
+def read_text(file_path:str,encoding = "utf-8"):
+    # open默认会将换行符处理为\n 这里先不处理
+    with open(file_path,mode="r",encoding=encoding,newline="") as f:
+        content = f.read()
+    return content
+
+def read_meta_data_with_sync(file_path:str) -> dict:
+    encoding = detect_file_encoding(file_path)
+    raw = read_text(file_path,encoding = encoding)
+    line_encoding = detect_line_endings_for_string(raw[0:4096])
+    return {
+        "content":raw.replace("\r\n","\n"), # 统一归一为unix默认换行符
+        "encoding":encoding,
+        "line_encoding":line_encoding
+    }
+
+if __name__ == "__main__":
+    pass

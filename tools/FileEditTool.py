@@ -25,13 +25,13 @@ async def file_edit(input_dict: dict, tool_context: toolContext, **kwargs) -> di
         return {
             "file_path": str(path),
             "success": False,
-            "error": f"File not found: {file_path}",
+            "error": f"error:File not found: {file_path}",
         }
     if not path.is_file():
         return {
             "file_path": str(path),
             "success": False,
-            "error": f"Not a file: {file_path}",
+            "error": f"error:Not a file: {file_path}",
         }
 
     # 读取当前文件内容
